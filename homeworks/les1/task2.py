@@ -18,4 +18,5 @@ if s<10:
 else:
     s=str(s)
 
-print(str(h)+':'+str(m)+':'+str(s))
+print(f"{h}:{m}:{s}")
+
