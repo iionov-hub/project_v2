@@ -17,7 +17,7 @@ def user_temp(v_str):
 
 
 n_string = input("Укажите слово или слова через пробел ")
-print(int_func(n_string))
+print(int_func(v_string))
 
 n_string = input("Укажите слово или слова через пробел ")
-print(user_temp(n_string))
+print(user_temp(v_string))
