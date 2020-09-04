@@ -41,9 +41,11 @@ VALUES
 
 select * from users;
 
-UPDATE users
-SET created_at = STR_TO_DATE(created_at, '%d.%m.%Y %k:%i'),
-    updated_at = STR_TO_DATE(updated_at, '%d.%m.%Y %k:%i');
+UPDATE
+  users
+SET
+  created_at = STR_TO_DATE(created_at, '%d.%m.%Y %k:%i'),
+  updated_at = STR_TO_DATE(updated_at, '%d.%m.%Y %k:%i');
 
 ALTER TABLE
   users
