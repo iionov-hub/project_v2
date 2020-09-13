@@ -1,0 +1,46 @@
+
+-- Задание 3
+-- Определить кто больше поставил лайков (всего) - мужчины или женщины?
+
+
+
+SELECT p.gender , count(1) -- 52  мужчины больше поставили
+FROM likes l
+  JOIN profiles p
+ ON l.user_id  = p.user_id
+Group by p.gender ;
+
+-- Задание 4
+-- Подсчитать общее количество лайков десяти самым молодым пользователям (сколько лайков получили 10 самых молодых пользователей).
+
+
+
+Select first_name, last_name, birthday, ag, count(1)   from (
+SELECT  u.first_name,  u.last_name, p.birthday ,TIMESTAMPDIFF(YEAR, p.birthday, NOW()) as ag
+FROM likes l
+  JOIN profiles p
+ ON l.target_id  = p.user_id
+   JOIN users u
+ ON p.user_id = u.id
+ where l.target_type_id  = 2
+order by ag
+LIMIT  10) as l
+group by first_name, last_name, birthday, ag
+
+
+
+-- Задание 5
+
+/*
+Найти 10 пользователей, которые проявляют наименьшую активность в использовании социальной сети
+(критерии активности необходимо определить самостоятельно).
+ Кто вообще не лайкал других пользователей
+ */
+
+
+SELECT *
+FROM users u
+  LEFT OUTER JOIN likes l
+   ON u.id = l.user_id
+Where l.user_id is NULL
+LIMIT 10;
