@@ -1,0 +1,42 @@
+
+-- 1. Проанализировать какие запросы могут выполняться наиболее часто в процессе работы приложения и добавить необходимые индексы
+-- Пока только 2 таблицу нашел , по остальным вроде все ок, т.к. в большенстве создается форенкей, что по сути работает как индекс
+
+Select * from media m;
+CREATE INDEX media_filepath_idx ON media(filepath);
+
+Select * from posts p2 ;
+CREATE INDEX posts_views_counter_idx  ON posts(views_counter);
+ /*
+2. Задание на оконные функции
+Построить запрос, который будет выводить следующие столбцы:
+имя группы
+среднее количество пользователей в группах
+самый молодой пользователь в группе
+самый старший пользователь в группе
+общее количество пользователей в группе
+всего пользователей в системе
+отношение в процентах (общее количество пользователей в группе / всего пользователей в системе) * 1002. Задание на оконные функции*/
+
+
+
+Select name, -- имя группы
+       avg(avg_users) as avg_users, -- среднее количество пользователей в группах
+       min_birthday, -- самый молодой пользователь в группе
+       max_birthday, -- самый старший пользователь в группе
+       count_users_c, -- общее количество пользователей в группе
+       count_users, -- всего пользователей в системе
+       (count_users_c / count_users) * 100 as proc -- отношение в процентах (общее количество пользователей в группе / всего пользователей в системе) * 100
+from (
+		Select c.name,
+		 count(cu.community_id) OVER (PARTITION BY cu.community_id) AS avg_users,
+		 min(TIMESTAMPDIFF(YEAR, p.birthday , NOW())) OVER (PARTITION BY cu.community_id) AS min_birthday,
+		 max(TIMESTAMPDIFF(YEAR, p.birthday , NOW())) OVER (PARTITION BY cu.community_id) AS max_birthday,
+		 count(cu.community_id) OVER (PARTITION BY cu.community_id) AS count_users_c,
+		 (Select count(1) from profiles p2) AS count_users
+		     FROM profiles p
+		     LEFT JOIN communities_users cu
+		        ON p.user_id = cu.user_id
+		     JOIN communities c
+		        ON cu.community_id  = c.id) m
+		        group by name, min_birthday, max_birthday, count_users_c, count_users, proc
