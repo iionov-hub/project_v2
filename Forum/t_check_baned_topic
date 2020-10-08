@@ -1,0 +1,22 @@
+DELIMITER $$
+$$
+CREATE TRIGGER t_check_baned_topic BEFORE INSERT ON topic FOR EACH ROW BEGIN
+
+	Declare n_count INTEGER;
+
+     Select count(1)
+     into n_count
+     from user_info u
+     where u.id_user = NEW.id_author
+     and u.is_banned = 1;
+
+	IF (n_count = 1) THEN
+
+
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'Вы забанены, обратитесь к администратору';
+
+	END IF;
+
+END$$
+DELIMITER ;
