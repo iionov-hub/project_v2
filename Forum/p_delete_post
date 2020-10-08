@@ -1,0 +1,27 @@
+DELIMITER $$
+$$
+CREATE PROCEDURE p_delete_post (mauthor INTEGER, mpost INTEGER)
+    DETERMINISTIC
+BEGIN
+	Declare n_id_topic INTEGER;
+	-- ПРоцедура удаление постов
+	-- Удалить пост могут только модераторы и администраторы
+	IF (f_admin_role(mauthor) = 1 OR f_admin_role(mauthor) = 2) THEN
+
+	  -- сохраняем ид топика для дальнейшего подсчета
+		 SELECT tp.id_topic
+		  INTO n_id_topic
+		  FROM topic_post tp
+		 WHERE tp.id_post = mpost;
+
+	   -- удаляем только post каскадом удалится и в topic_post
+		DELETE FROM post
+	     WHERE id = mpost;
+
+	   -- делаем пересчет постов и сообщений пользователя
+	   call p_refresh_num(n_id_topic,mauthor,1);
+
+	END IF;
+
+END$$
+DELIMITER ;

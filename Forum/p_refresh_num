@@ -1,0 +1,25 @@
+DELIMITER $$
+$$
+CREATE PROCEDURE p_refresh_num (n_id INTEGER, n_user INTEGER, n_type INTEGER)
+    DETERMINISTIC
+BEGIN
+	-- Процедура подсчета
+	-- Удалить пост могут только модераторы и администраторы
+	IF (n_type = 1) THEN
+
+		update  topic_info ti
+		set ti.num_posts = (SELECT count(1)
+					          FROM topic_post tp
+						     WHERE tp.id_topic  = n_id)
+		where ti.id_topic = n_id;
+
+	END IF;
+
+	UPDATE user_info ui
+	SET ui.num_message = (SELECT count(*)
+	                        FROM post
+	                        WHERE id_author = n_user)
+	WHERE ui.id_user = n_user;
+
+END$$
+DELIMITER ;
